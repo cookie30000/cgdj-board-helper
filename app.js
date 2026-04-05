@@ -18,6 +18,8 @@ const openFileButton = document.querySelector("#open-file-button");
 const openRecognitionButton = document.querySelector("#open-recognition-button");
 const startCameraButton = document.querySelector("#start-camera-button");
 const capturePhotoButton = document.querySelector("#capture-photo-button");
+const rotateImageButton = document.querySelector("#rotate-image-button");
+const applyRecognitionButton = document.querySelector("#apply-recognition-button");
 const addPieceButton = document.querySelector("#add-piece-button");
 const showRecommendedButton = document.querySelector("#show-recommended-button");
 const cameraVideo = document.querySelector("#camera-video");
@@ -54,6 +56,7 @@ let cameraStream = null;
 let pendingNewEntryId = null;
 let deviceOrientationDegrees = null;
 let deviceOrientationListening = false;
+let pendingRecognitionEntries = [];
 
 ort.env.wasm.numThreads = 1;
 ort.env.wasm.wasmPaths = new URL("./vendor/", import.meta.url).href;
@@ -550,6 +553,18 @@ async function rotateImage(image, degrees) {
   return loadImageFromSource(stage.toDataURL("image/jpeg", 0.92));
 }
 
+async function rotateCurrentImageBy90() {
+  if (!currentImage) {
+    recognitionNote.textContent = "先に画像を用意してください。";
+    return;
+  }
+
+  currentImage = await rotateImage(currentImage, 90);
+  drawResult(currentImage, handEntries);
+  recognitionNote.textContent = "画像を 90 度回転しました。再認識します。";
+  await detectAndApplyCurrentImage();
+}
+
 function getCaptureRotationDegrees() {
   if (typeof deviceOrientationDegrees === "number") {
     return (360 - deviceOrientationDegrees) % 360;
@@ -784,6 +799,7 @@ function closeModal(kind) {
   modal.hidden = true;
   if (kind === "recognition") {
     stopCamera();
+    pendingRecognitionEntries = [];
   }
   if (kind === "picker") {
     resetPickerFilters();
@@ -869,6 +885,19 @@ function replaceHand(entries) {
   syncUi();
 }
 
+function applyPendingRecognition() {
+  if (!pendingRecognitionEntries.length) {
+    replaceHand([]);
+    closeModal("recognition");
+    setStatus("0 枚認識");
+    return;
+  }
+  replaceHand(pendingRecognitionEntries);
+  pendingRecognitionEntries = [];
+  closeModal("recognition");
+  setStatus(`${handEntries.length} 枚認識`);
+}
+
 function assignCharacterToEntry(entryId, name) {
   handEntries = handEntries.map((entry) => (entry.id === entryId ? { ...entry, name } : entry));
   activeEntryId = entryId;
@@ -922,10 +951,10 @@ async function detectAndApplyCurrentImage() {
     })
   );
 
-  replaceHand(entries);
+  pendingRecognitionEntries = entries;
   drawResult(currentImage, entries);
-  closeModal("recognition");
-  setStatus(`${entries.length} 枚認識`);
+  recognitionNote.textContent = `認識結果を確認して OK を押してください。${entries.length} 枚認識しました。`;
+  setStatus("認識完了");
 }
 
 function escapeHtml(value) {
@@ -978,6 +1007,17 @@ capturePhotoButton.addEventListener("click", () => {
     console.error(error);
     recognitionNote.textContent = `撮影に失敗しました: ${error.message}`;
   });
+});
+
+rotateImageButton.addEventListener("click", () => {
+  rotateCurrentImageBy90().catch((error) => {
+    console.error(error);
+    recognitionNote.textContent = `回転に失敗しました: ${error.message}`;
+  });
+});
+
+applyRecognitionButton.addEventListener("click", () => {
+  applyPendingRecognition();
 });
 
 function handleCameraTap(event) {
