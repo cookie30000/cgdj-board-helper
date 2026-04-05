@@ -21,6 +21,7 @@ const capturePhotoButton = document.querySelector("#capture-photo-button");
 const addPieceButton = document.querySelector("#add-piece-button");
 const showRecommendedButton = document.querySelector("#show-recommended-button");
 const cameraVideo = document.querySelector("#camera-video");
+const cameraFrame = document.querySelector("#camera-frame");
 const canvas = document.querySelector("#result-canvas");
 const ctx = canvas.getContext("2d");
 const statusLabel = document.querySelector("#status-label");
@@ -481,6 +482,21 @@ async function loadImageFromSource(source) {
   });
 }
 
+async function normalizeImageOrientation(image) {
+  if (image.width <= image.height) {
+    return image;
+  }
+
+  const stage = document.createElement("canvas");
+  stage.width = image.height;
+  stage.height = image.width;
+  const stageCtx = stage.getContext("2d");
+  stageCtx.translate(stage.width / 2, stage.height / 2);
+  stageCtx.rotate(Math.PI / 2);
+  stageCtx.drawImage(image, -image.width / 2, -image.height / 2);
+  return loadImageFromSource(stage.toDataURL("image/jpeg", 0.92));
+}
+
 function createEntry({ name = "", matches = [], score = null, box = null } = {}) {
   return {
     id: nextEntryId++,
@@ -754,7 +770,7 @@ async function capturePhoto() {
   stage.height = cameraVideo.videoHeight;
   stage.getContext("2d").drawImage(cameraVideo, 0, 0, stage.width, stage.height);
   const source = stage.toDataURL("image/jpeg", 0.92);
-  const image = await loadImageFromSource(source);
+  const image = await normalizeImageOrientation(await loadImageFromSource(source));
   stopCamera();
   setCurrentImage(image, "撮影画像を読み込みました。");
   await detectAndApplyCurrentImage();
@@ -857,7 +873,7 @@ fileInput.addEventListener("change", async (event) => {
   if (!file) {
     return;
   }
-  const image = await loadImageFromSource(URL.createObjectURL(file));
+  const image = await normalizeImageOrientation(await loadImageFromSource(URL.createObjectURL(file)));
   stopCamera();
   setCurrentImage(image, "画像を読み込みました。");
   await detectAndApplyCurrentImage();
@@ -872,6 +888,16 @@ startCameraButton.addEventListener("click", () => {
 });
 
 capturePhotoButton.addEventListener("click", () => {
+  capturePhoto().catch((error) => {
+    console.error(error);
+    recognitionNote.textContent = `撮影に失敗しました: ${error.message}`;
+  });
+});
+
+cameraFrame.addEventListener("click", () => {
+  if (cameraVideo.hidden || capturePhotoButton.disabled) {
+    return;
+  }
   capturePhoto().catch((error) => {
     console.error(error);
     recognitionNote.textContent = `撮影に失敗しました: ${error.message}`;

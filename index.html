@@ -38,14 +38,14 @@
 
         <div class="button-row">
           <button id="start-camera-button" type="button">カメラ起動</button>
-          <button id="capture-photo-button" type="button" class="secondary" disabled>撮影</button>
+          <button id="capture-photo-button" type="button" class="capture-button" aria-label="撮影" disabled></button>
           <button id="open-file-button" type="button" class="secondary">画像選択</button>
         </div>
 
         <input id="file-input" type="file" accept="image/*" hidden />
 
         <div class="recognition-grid">
-          <div class="camera-frame">
+          <div id="camera-frame" class="camera-frame">
             <video id="camera-video" playsinline autoplay muted hidden></video>
             <canvas id="result-canvas"></canvas>
           </div>

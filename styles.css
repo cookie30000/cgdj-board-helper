@@ -117,6 +117,24 @@ button.secondary {
   border: 1px solid var(--line);
 }
 
+.capture-button {
+  min-width: 44px;
+  width: 44px;
+  padding: 0;
+  border-radius: 999px;
+  background: #f4efe8;
+  border: 1px solid rgba(131, 103, 71, 0.18);
+  position: relative;
+}
+
+.capture-button::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: 999px;
+  background: #cf3f32;
+}
+
 button:disabled {
   opacity: 0.5;
   cursor: default;
@@ -390,6 +408,7 @@ select {
   border-radius: 18px;
   overflow: hidden;
   background: linear-gradient(135deg, rgba(179, 77, 46, 0.12), transparent), #efe8db;
+  cursor: pointer;
 }
 
 #camera-video,
