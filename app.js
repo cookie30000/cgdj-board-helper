@@ -52,6 +52,8 @@ let expandedEntryId = null;
 let nextEntryId = 1;
 let cameraStream = null;
 let pendingNewEntryId = null;
+let deviceOrientationDegrees = null;
+let deviceOrientationListening = false;
 
 ort.env.wasm.numThreads = 1;
 ort.env.wasm.wasmPaths = new URL("./vendor/", import.meta.url).href;
@@ -139,6 +141,55 @@ function resetPickerFilters() {
 
 function setStatus(message) {
   statusLabel.textContent = message;
+}
+
+function inferOrientationFromDeviceEvent(event) {
+  if (typeof event.beta !== "number" || typeof event.gamma !== "number") {
+    return null;
+  }
+
+  if (Math.abs(event.gamma) > 45) {
+    return event.gamma > 0 ? 90 : 270;
+  }
+
+  if (Math.abs(event.beta) > 45) {
+    return 0;
+  }
+
+  return null;
+}
+
+function handleDeviceOrientation(event) {
+  const inferred = inferOrientationFromDeviceEvent(event);
+  if (inferred !== null) {
+    deviceOrientationDegrees = inferred;
+  }
+}
+
+async function ensureDeviceOrientationAccess() {
+  if (typeof window === "undefined" || typeof DeviceOrientationEvent === "undefined") {
+    return;
+  }
+
+  if (
+    typeof DeviceOrientationEvent.requestPermission === "function" &&
+    (await DeviceOrientationEvent.requestPermission()) !== "granted"
+  ) {
+    return;
+  }
+
+  if (!deviceOrientationListening) {
+    window.addEventListener("deviceorientation", handleDeviceOrientation, true);
+    deviceOrientationListening = true;
+  }
+}
+
+function stopDeviceOrientationAccess() {
+  if (!deviceOrientationListening) {
+    return;
+  }
+  window.removeEventListener("deviceorientation", handleDeviceOrientation, true);
+  deviceOrientationListening = false;
 }
 
 function clamp(value, min, max) {
@@ -482,19 +533,49 @@ async function loadImageFromSource(source) {
   });
 }
 
-async function normalizeImageOrientation(image) {
-  if (image.width <= image.height) {
+async function rotateImage(image, degrees) {
+  const normalized = ((degrees % 360) + 360) % 360;
+  if (normalized === 0) {
     return image;
   }
 
   const stage = document.createElement("canvas");
-  stage.width = image.height;
-  stage.height = image.width;
+  const quarterTurn = normalized === 90 || normalized === 270;
+  stage.width = quarterTurn ? image.height : image.width;
+  stage.height = quarterTurn ? image.width : image.height;
   const stageCtx = stage.getContext("2d");
   stageCtx.translate(stage.width / 2, stage.height / 2);
-  stageCtx.rotate(Math.PI / 2);
+  stageCtx.rotate((normalized * Math.PI) / 180);
   stageCtx.drawImage(image, -image.width / 2, -image.height / 2);
   return loadImageFromSource(stage.toDataURL("image/jpeg", 0.92));
+}
+
+function getCaptureRotationDegrees() {
+  if (typeof deviceOrientationDegrees === "number") {
+    return (360 - deviceOrientationDegrees) % 360;
+  }
+
+  const orientationAngle =
+    typeof window.screen?.orientation?.angle === "number"
+      ? window.screen.orientation.angle
+      : typeof window.orientation === "number"
+        ? window.orientation
+        : 0;
+
+  const normalized = ((orientationAngle % 360) + 360) % 360;
+  if (normalized === 90 || normalized === 270) {
+    return (360 - normalized) % 360;
+  }
+
+  const isLandscapeViewport =
+    window.matchMedia?.("(orientation: landscape)")?.matches ||
+    window.innerWidth > window.innerHeight;
+
+  if (isLandscapeViewport) {
+    return 90;
+  }
+
+  return 0;
 }
 
 function createEntry({ name = "", matches = [], score = null, box = null } = {}) {
@@ -737,6 +818,8 @@ async function startCamera() {
   }
 
   stopCamera();
+  deviceOrientationDegrees = null;
+  await ensureDeviceOrientationAccess();
   cameraStream = await navigator.mediaDevices.getUserMedia({
     video: { facingMode: { ideal: "environment" } },
     audio: false,
@@ -758,6 +841,8 @@ function stopCamera() {
   cameraVideo.srcObject = null;
   cameraVideo.hidden = true;
   capturePhotoButton.disabled = true;
+  deviceOrientationDegrees = null;
+  stopDeviceOrientationAccess();
 }
 
 async function capturePhoto() {
@@ -770,7 +855,8 @@ async function capturePhoto() {
   stage.height = cameraVideo.videoHeight;
   stage.getContext("2d").drawImage(cameraVideo, 0, 0, stage.width, stage.height);
   const source = stage.toDataURL("image/jpeg", 0.92);
-  const image = await normalizeImageOrientation(await loadImageFromSource(source));
+  const captured = await loadImageFromSource(source);
+  const image = await rotateImage(captured, getCaptureRotationDegrees());
   stopCamera();
   setCurrentImage(image, "撮影画像を読み込みました。");
   await detectAndApplyCurrentImage();
@@ -873,7 +959,7 @@ fileInput.addEventListener("change", async (event) => {
   if (!file) {
     return;
   }
-  const image = await normalizeImageOrientation(await loadImageFromSource(URL.createObjectURL(file)));
+  const image = await loadImageFromSource(URL.createObjectURL(file));
   stopCamera();
   setCurrentImage(image, "画像を読み込みました。");
   await detectAndApplyCurrentImage();
@@ -894,7 +980,8 @@ capturePhotoButton.addEventListener("click", () => {
   });
 });
 
-cameraFrame.addEventListener("click", () => {
+function handleCameraTap(event) {
+  event.preventDefault();
   if (cameraVideo.hidden || capturePhotoButton.disabled) {
     return;
   }
@@ -902,7 +989,12 @@ cameraFrame.addEventListener("click", () => {
     console.error(error);
     recognitionNote.textContent = `撮影に失敗しました: ${error.message}`;
   });
-});
+}
+
+cameraFrame.addEventListener("pointerup", handleCameraTap);
+cameraVideo.addEventListener("pointerup", handleCameraTap);
+cameraFrame.addEventListener("touchend", handleCameraTap, { passive: false });
+cameraVideo.addEventListener("touchend", handleCameraTap, { passive: false });
 
 addPieceButton.addEventListener("click", () => {
   addManualEntry();
