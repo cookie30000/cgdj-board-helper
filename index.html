@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CGDJ Board Helper</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="ribbon">
+      <div class="ribbon-inner">
+        <strong class="ribbon-title">CGDJ BOARD HELPER</strong>
+        <div class="button-row">
+          <button id="open-recognition-button" type="button">撮影/画像認識</button>
+          <button id="add-piece-button" type="button" class="secondary">手動追加</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="panel hand-panel">
+        <div class="section-header">
+          <h2 id="hand-count-label">0 枚</h2>
+          <span id="status-label" class="subtle">初期化中</span>
+          <button id="show-recommended-button" type="button" class="secondary">近い役を見る</button>
+        </div>
+        <div id="hand-list" class="hand-list"></div>
+      </section>
+    </main>
+
+    <div id="recognition-modal" class="modal" hidden>
+      <div class="modal-backdrop" data-close-modal="recognition"></div>
+      <section class="modal-card modal-card-wide">
+        <div class="modal-header">
+          <h2>撮影/画像認識</h2>
+          <button type="button" class="icon-button" data-close-modal="recognition" aria-label="閉じる">×</button>
+        </div>
+
+        <div class="button-row">
+          <button id="start-camera-button" type="button">カメラ起動</button>
+          <button id="capture-photo-button" type="button" class="secondary" disabled>撮影</button>
+          <button id="open-file-button" type="button" class="secondary">画像選択</button>
+        </div>
+
+        <input id="file-input" type="file" accept="image/*" hidden />
+
+        <div class="recognition-grid">
+          <div class="camera-frame">
+            <video id="camera-video" playsinline autoplay muted hidden></video>
+            <canvas id="result-canvas"></canvas>
+          </div>
+          <p id="recognition-note" class="note">画像を選ぶか撮影すると、即座に認識して手持ちへ反映します。</p>
+        </div>
+      </section>
+    </div>
+
+    <div id="picker-modal" class="modal" hidden>
+      <div class="modal-backdrop" data-close-modal="picker"></div>
+      <section class="modal-card">
+        <div class="modal-header">
+          <div>
+            <h2>駒を差し替える</h2>
+            <p id="picker-context" class="subtle">編集中の駒を選択してください。</p>
+          </div>
+          <button type="button" class="icon-button" data-close-modal="picker" aria-label="閉じる">×</button>
+        </div>
+
+        <div class="grid">
+          <label class="field">
+            <span>属性</span>
+            <select id="attribute-select"></select>
+          </label>
+          <label class="field">
+            <span>頭文字</span>
+            <select id="initial-select"></select>
+          </label>
+        </div>
+
+        <label class="field">
+          <span>名前検索</span>
+          <input id="search-input" type="search" placeholder="名前またはよみで検索" />
+        </label>
+
+        <div id="character-list" class="character-list"></div>
+      </section>
+    </div>
+
+    <div id="recommended-modal" class="modal" hidden>
+      <div class="modal-backdrop" data-close-modal="recommended"></div>
+      <section class="modal-card">
+        <div class="modal-header">
+          <h2>近い役</h2>
+          <button type="button" class="icon-button" data-close-modal="recommended" aria-label="閉じる">×</button>
+        </div>
+        <div id="recommended-units" class="unit-list"></div>
+      </section>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

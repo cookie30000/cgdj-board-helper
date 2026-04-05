@@ -1,0 +1,762 @@
+{
+  "相原雪乃": {
+    "attribute": "キュート",
+    "reading": "あいはらゆきの"
+  },
+  "赤西瑛梨華": {
+    "attribute": "キュート",
+    "reading": "あかにしえりか"
+  },
+  "浅野風香": {
+    "attribute": "キュート",
+    "reading": "あさのふうか"
+  },
+  "安部菜々": {
+    "attribute": "キュート",
+    "reading": "あべなな"
+  },
+  "有浦柑奈": {
+    "attribute": "キュート",
+    "reading": "ありうらかんな"
+  },
+  "安斎都": {
+    "attribute": "キュート",
+    "reading": "あんざいみやこ"
+  },
+  "五十嵐響子": {
+    "attribute": "キュート",
+    "reading": "いがらしきょうこ"
+  },
+  "池袋晶葉": {
+    "attribute": "キュート",
+    "reading": "いけぶくろあきは"
+  },
+  "一ノ瀬志希": {
+    "attribute": "キュート",
+    "reading": "いちのせしき"
+  },
+  "今井加奈": {
+    "attribute": "キュート",
+    "reading": "いまいかな"
+  },
+  "井村雪菜": {
+    "attribute": "キュート",
+    "reading": "いむらせつな"
+  },
+  "江上椿": {
+    "attribute": "キュート",
+    "reading": "えがみつばき"
+  },
+  "太田優": {
+    "attribute": "キュート",
+    "reading": "おおたゆう"
+  },
+  "大西由里子": {
+    "attribute": "キュート",
+    "reading": "おおにしゆりこ"
+  },
+  "大沼くるみ": {
+    "attribute": "キュート",
+    "reading": "おおぬまくるみ"
+  },
+  "大原みちる": {
+    "attribute": "キュート",
+    "reading": "おおはらみちる"
+  },
+  "緒方智絵里": {
+    "attribute": "キュート",
+    "reading": "おがたちえり"
+  },
+  "奥山沙織": {
+    "attribute": "キュート",
+    "reading": "おくやまさおり"
+  },
+  "乙倉悠貴": {
+    "attribute": "キュート",
+    "reading": "おとくらゆうき"
+  },
+  "日下部若葉": {
+    "attribute": "キュート",
+    "reading": "くさかべわかば"
+  },
+  "工藤忍": {
+    "attribute": "キュート",
+    "reading": "くどうしのぶ"
+  },
+  "クラリス": {
+    "attribute": "キュート",
+    "reading": "くらりす"
+  },
+  "栗原ネネ": {
+    "attribute": "キュート",
+    "reading": "くりはらねね"
+  },
+  "黒埼ちとせ": {
+    "attribute": "キュート",
+    "reading": "くろさきちとせ"
+  },
+  "古賀小春": {
+    "attribute": "キュート",
+    "reading": "こがこはる"
+  },
+  "輿水幸子": {
+    "attribute": "キュート",
+    "reading": "こしみずさちこ"
+  },
+  "小早川紗枝": {
+    "attribute": "キュート",
+    "reading": "こばやかわさえ"
+  },
+  "小日向美穂": {
+    "attribute": "キュート",
+    "reading": "こひなたみほ"
+  },
+  "西園寺琴歌": {
+    "attribute": "キュート",
+    "reading": "さいおんじことか"
+  },
+  "榊原里美": {
+    "attribute": "キュート",
+    "reading": "さかきばらさとみ"
+  },
+  "佐久間まゆ": {
+    "attribute": "キュート",
+    "reading": "さくままゆ"
+  },
+  "櫻井桃華": {
+    "attribute": "キュート",
+    "reading": "さくらいももか"
+  },
+  "椎名法子": {
+    "attribute": "キュート",
+    "reading": "しいなのりこ"
+  },
+  "島村卯月": {
+    "attribute": "キュート",
+    "reading": "しまむらうづき"
+  },
+  "白菊ほたる": {
+    "attribute": "キュート",
+    "reading": "しらぎくほたる"
+  },
+  "白雪千夜": {
+    "attribute": "キュート",
+    "reading": "しらゆきちよ"
+  },
+  "涼宮星花": {
+    "attribute": "キュート",
+    "reading": "すずみやせいか"
+  },
+  "関裕美": {
+    "attribute": "キュート",
+    "reading": "せきひろみ"
+  },
+  "月宮雅": {
+    "attribute": "キュート",
+    "reading": "つきみやみやび"
+  },
+  "辻野あかり": {
+    "attribute": "キュート",
+    "reading": "つじのあかり"
+  },
+  "道明寺歌鈴": {
+    "attribute": "キュート",
+    "reading": "どうみょうじかりん"
+  },
+  "長富蓮実": {
+    "attribute": "キュート",
+    "reading": "ながとみはすみ"
+  },
+  "中野有香": {
+    "attribute": "キュート",
+    "reading": "なかのゆか"
+  },
+  "丹羽仁美": {
+    "attribute": "キュート",
+    "reading": "にわひとみ"
+  },
+  "早坂美玲": {
+    "attribute": "キュート",
+    "reading": "はやさかみれい"
+  },
+  "原田美世": {
+    "attribute": "キュート",
+    "reading": "はらだみよ"
+  },
+  "兵藤レナ": {
+    "attribute": "キュート",
+    "reading": "ひょうどうれな"
+  },
+  "福山舞": {
+    "attribute": "キュート",
+    "reading": "ふくやままい"
+  },
+  "藤本里奈": {
+    "attribute": "キュート",
+    "reading": "ふじもとりな"
+  },
+  "双葉杏": {
+    "attribute": "キュート",
+    "reading": "ふたばあんず"
+  },
+  "前川みく": {
+    "attribute": "キュート",
+    "reading": "まえかわみく"
+  },
+  "松原早耶": {
+    "attribute": "キュート",
+    "reading": "まつばらさや"
+  },
+  "間中美里": {
+    "attribute": "キュート",
+    "reading": "まなかみさと"
+  },
+  "水本ゆかり": {
+    "attribute": "キュート",
+    "reading": "みずもとゆかり"
+  },
+  "三村かな子": {
+    "attribute": "キュート",
+    "reading": "みむらかなこ"
+  },
+  "宮本フレデリカ": {
+    "attribute": "キュート",
+    "reading": "みやもとふれでりか"
+  },
+  "棟方愛海": {
+    "attribute": "キュート",
+    "reading": "むなかたあつみ"
+  },
+  "村松さくら": {
+    "attribute": "キュート",
+    "reading": "むらまつさくら"
+  },
+  "持田亜里沙": {
+    "attribute": "キュート",
+    "reading": "もちだありさ"
+  },
+  "桃井あずき": {
+    "attribute": "キュート",
+    "reading": "ももいあずき"
+  },
+  "楊菲菲": {
+    "attribute": "キュート",
+    "reading": "やおふぇいふぇい"
+  },
+  "柳清良": {
+    "attribute": "キュート",
+    "reading": "やなぎきよら"
+  },
+  "柳瀬美由紀": {
+    "attribute": "キュート",
+    "reading": "やなせみゆき"
+  },
+  "遊佐こずえ": {
+    "attribute": "キュート",
+    "reading": "ゆさこずえ"
+  },
+  "横山千佳": {
+    "attribute": "キュート",
+    "reading": "よこやまちか"
+  },
+  "相川千夏": {
+    "attribute": "クール",
+    "reading": "あいかわちなつ"
+  },
+  "浅利七海": {
+    "attribute": "クール",
+    "reading": "あさりななみ"
+  },
+  "アナスタシア": {
+    "attribute": "クール",
+    "reading": "あなすたしあ"
+  },
+  "綾瀬穂乃香": {
+    "attribute": "クール",
+    "reading": "あやせほのか"
+  },
+  "荒木比奈": {
+    "attribute": "クール",
+    "reading": "あらきひな"
+  },
+  "伊集院惠": {
+    "attribute": "クール",
+    "reading": "いじゅういんめぐみ"
+  },
+  "氏家むつみ": {
+    "attribute": "クール",
+    "reading": "うじいえむつみ"
+  },
+  "梅木音葉": {
+    "attribute": "クール",
+    "reading": "うめきおとは"
+  },
+  "大石泉": {
+    "attribute": "クール",
+    "reading": "おおいしいずみ"
+  },
+  "岡崎泰葉": {
+    "attribute": "クール",
+    "reading": "おかざきやすは"
+  },
+  "上条春菜": {
+    "attribute": "クール",
+    "reading": "かみじょうはるな"
+  },
+  "神谷奈緒": {
+    "attribute": "クール",
+    "reading": "かみやなお"
+  },
+  "川島瑞樹": {
+    "attribute": "クール",
+    "reading": "かわしまみずき"
+  },
+  "神崎蘭子": {
+    "attribute": "クール",
+    "reading": "かんざきらんこ"
+  },
+  "岸部彩華": {
+    "attribute": "クール",
+    "reading": "きしべあやか"
+  },
+  "木場真奈美": {
+    "attribute": "クール",
+    "reading": "きばまなみ"
+  },
+  "桐野アヤ": {
+    "attribute": "クール",
+    "reading": "きりのあや"
+  },
+  "桐生つかさ": {
+    "attribute": "クール",
+    "reading": "きりゅうつかさ"
+  },
+  "黒川千秋": {
+    "attribute": "クール",
+    "reading": "くろかわちあき"
+  },
+  "ケイト": {
+    "attribute": "クール",
+    "reading": "けいと"
+  },
+  "小室千奈美": {
+    "attribute": "クール",
+    "reading": "こむろちなみ"
+  },
+  "鷺沢文香": {
+    "attribute": "クール",
+    "reading": "さぎさわふみか"
+  },
+  "佐々木千枝": {
+    "attribute": "クール",
+    "reading": "ささきちえ"
+  },
+  "佐城雪美": {
+    "attribute": "クール",
+    "reading": "さじょうゆきみ"
+  },
+  "塩見周子": {
+    "attribute": "クール",
+    "reading": "しおみしゅうこ"
+  },
+  "篠原礼": {
+    "attribute": "クール",
+    "reading": "しのはられい"
+  },
+  "渋谷凛": {
+    "attribute": "クール",
+    "reading": "しぶやりん"
+  },
+  "白坂小梅": {
+    "attribute": "クール",
+    "reading": "しらさかこうめ"
+  },
+  "砂塚あきら": {
+    "attribute": "クール",
+    "reading": "すなづかあきら"
+  },
+  "瀬名詩織": {
+    "attribute": "クール",
+    "reading": "せなしおり"
+  },
+  "高垣楓": {
+    "attribute": "クール",
+    "reading": "たかがきかえで"
+  },
+  "高橋礼子": {
+    "attribute": "クール",
+    "reading": "たかはしれいこ"
+  },
+  "鷹富士茄子": {
+    "attribute": "クール",
+    "reading": "たかふじかこ"
+  },
+  "高峯のあ": {
+    "attribute": "クール",
+    "reading": "たかみねのあ"
+  },
+  "多田李衣菜": {
+    "attribute": "クール",
+    "reading": "ただりいな"
+  },
+  "橘ありす": {
+    "attribute": "クール",
+    "reading": "たちばなありす"
+  },
+  "東郷あい": {
+    "attribute": "クール",
+    "reading": "とうごうあい"
+  },
+  "成宮由愛": {
+    "attribute": "クール",
+    "reading": "なるみやゆめ"
+  },
+  "西川保奈美": {
+    "attribute": "クール",
+    "reading": "にしかわほなみ"
+  },
+  "新田美波": {
+    "attribute": "クール",
+    "reading": "にったみなみ"
+  },
+  "二宮飛鳥": {
+    "attribute": "クール",
+    "reading": "にのみやあすか"
+  },
+  "服部瞳子": {
+    "attribute": "クール",
+    "reading": "はっとりとうこ"
+  },
+  "速水奏": {
+    "attribute": "クール",
+    "reading": "はやみかなで"
+  },
+  "柊志乃": {
+    "attribute": "クール",
+    "reading": "ひいらぎしの"
+  },
+  "久川颯": {
+    "attribute": "クール",
+    "reading": "ひさかわはやて"
+  },
+  "藤居朋": {
+    "attribute": "クール",
+    "reading": "ふじいとも"
+  },
+  "藤原肇": {
+    "attribute": "クール",
+    "reading": "ふじわらはじめ"
+  },
+  "古澤頼子": {
+    "attribute": "クール",
+    "reading": "ふるさわよりこ"
+  },
+  "ヘレン": {
+    "attribute": "クール",
+    "reading": "へれん"
+  },
+  "北条加蓮": {
+    "attribute": "クール",
+    "reading": "ほうじょうかれん"
+  },
+  "松尾千鶴": {
+    "attribute": "クール",
+    "reading": "まつおちづる"
+  },
+  "松永涼": {
+    "attribute": "クール",
+    "reading": "まつながりょう"
+  },
+  "松本沙理奈": {
+    "attribute": "クール",
+    "reading": "まつもとさりな"
+  },
+  "水木聖來": {
+    "attribute": "クール",
+    "reading": "みずきせいら"
+  },
+  "水野翠": {
+    "attribute": "クール",
+    "reading": "みずのみどり"
+  },
+  "三船美優": {
+    "attribute": "クール",
+    "reading": "みふねみゆ"
+  },
+  "望月聖": {
+    "attribute": "クール",
+    "reading": "もちづきひじり"
+  },
+  "森久保乃々": {
+    "attribute": "クール",
+    "reading": "もりくぼのの"
+  },
+  "八神マキノ": {
+    "attribute": "クール",
+    "reading": "やがみまきの"
+  },
+  "大和亜季": {
+    "attribute": "クール",
+    "reading": "やまとあき"
+  },
+  "結城晴": {
+    "attribute": "クール",
+    "reading": "ゆうきはる"
+  },
+  "吉岡沙紀": {
+    "attribute": "クール",
+    "reading": "よしおかさき"
+  },
+  "ライラ": {
+    "attribute": "クール",
+    "reading": "らいら"
+  },
+  "脇山珠美": {
+    "attribute": "クール",
+    "reading": "わきやまたまみ"
+  },
+  "和久井留美": {
+    "attribute": "クール",
+    "reading": "わくいるみ"
+  },
+  "愛野渚": {
+    "attribute": "パッション",
+    "reading": "あいのなぎさ"
+  },
+  "相葉夕美": {
+    "attribute": "パッション",
+    "reading": "あいばゆみ"
+  },
+  "赤城みりあ": {
+    "attribute": "パッション",
+    "reading": "あかぎみりあ"
+  },
+  "イヴ・サンタクロース": {
+    "attribute": "パッション",
+    "reading": "いゔさんたくろーす"
+  },
+  "市原仁奈": {
+    "attribute": "パッション",
+    "reading": "いちはらにな"
+  },
+  "上田鈴帆": {
+    "attribute": "パッション",
+    "reading": "うえだすずほ"
+  },
+  "衛藤美紗希": {
+    "attribute": "パッション",
+    "reading": "えとうみさき"
+  },
+  "海老原菜帆": {
+    "attribute": "パッション",
+    "reading": "えびはらなほ"
+  },
+  "及川雫": {
+    "attribute": "パッション",
+    "reading": "おいかわしずく"
+  },
+  "大槻唯": {
+    "attribute": "パッション",
+    "reading": "おおつきゆい"
+  },
+  "片桐早苗": {
+    "attribute": "パッション",
+    "reading": "かたぎりさなえ"
+  },
+  "喜多日菜子": {
+    "attribute": "パッション",
+    "reading": "きたひなこ"
+  },
+  "北川真尋": {
+    "attribute": "パッション",
+    "reading": "きたがわまひろ"
+  },
+  "喜多見柚": {
+    "attribute": "パッション",
+    "reading": "きたみゆず"
+  },
+  "木村夏樹": {
+    "attribute": "パッション",
+    "reading": "きむらなつき"
+  },
+  "キャシー・グラハム": {
+    "attribute": "パッション",
+    "reading": "きゃしーぐらはむ"
+  },
+  "小関麗奈": {
+    "attribute": "パッション",
+    "reading": "こせきれいな"
+  },
+  "小松伊吹": {
+    "attribute": "パッション",
+    "reading": "こまついぶき"
+  },
+  "財前時子": {
+    "attribute": "パッション",
+    "reading": "ざいぜんときこ"
+  },
+  "斉藤洋子": {
+    "attribute": "パッション",
+    "reading": "さいとうようこ"
+  },
+  "冴島清美": {
+    "attribute": "パッション",
+    "reading": "さえじまきよみ"
+  },
+  "佐藤心": {
+    "attribute": "パッション",
+    "reading": "さとうしん"
+  },
+  "沢田麻理菜": {
+    "attribute": "パッション",
+    "reading": "さわだまりな"
+  },
+  "首藤葵": {
+    "attribute": "パッション",
+    "reading": "しゅとうあおい"
+  },
+  "城ヶ崎美嘉": {
+    "attribute": "パッション",
+    "reading": "じょうがさきみか"
+  },
+  "城ヶ崎莉嘉": {
+    "attribute": "パッション",
+    "reading": "じょうがさきりか"
+  },
+  "杉坂海": {
+    "attribute": "パッション",
+    "reading": "すぎさかうみ"
+  },
+  "仙崎恵磨": {
+    "attribute": "パッション",
+    "reading": "せんざきえま"
+  },
+  "相馬夏美": {
+    "attribute": "パッション",
+    "reading": "そうまなつみ"
+  },
+  "高森藍子": {
+    "attribute": "パッション",
+    "reading": "たかもりあいこ"
+  },
+  "土屋亜子": {
+    "attribute": "パッション",
+    "reading": "つちやあこ"
+  },
+  "十時愛梨": {
+    "attribute": "パッション",
+    "reading": "とときあいり"
+  },
+  "ナターリア": {
+    "attribute": "パッション",
+    "reading": "なたーりあ"
+  },
+  "並木芽衣子": {
+    "attribute": "パッション",
+    "reading": "なみきめいこ"
+  },
+  "南条光": {
+    "attribute": "パッション",
+    "reading": "なんじょうひかる"
+  },
+  "難波笑美": {
+    "attribute": "パッション",
+    "reading": "なんばえみ"
+  },
+  "西島櫂": {
+    "attribute": "パッション",
+    "reading": "にしじまかい"
+  },
+  "野々村そら": {
+    "attribute": "パッション",
+    "reading": "ののむらそら"
+  },
+  "浜川愛結奈": {
+    "attribute": "パッション",
+    "reading": "はまかわあゆな"
+  },
+  "浜口あやめ": {
+    "attribute": "パッション",
+    "reading": "はまぐちあやめ"
+  },
+  "久川凪": {
+    "attribute": "パッション",
+    "reading": "ひさかわなぎ"
+  },
+  "日野茜": {
+    "attribute": "パッション",
+    "reading": "ひのあかね"
+  },
+  "姫川友紀": {
+    "attribute": "パッション",
+    "reading": "ひめかわゆき"
+  },
+  "星輝子": {
+    "attribute": "パッション",
+    "reading": "ほししょうこ"
+  },
+  "堀裕子": {
+    "attribute": "パッション",
+    "reading": "ほりゆうこ"
+  },
+  "本田未央": {
+    "attribute": "パッション",
+    "reading": "ほんだみお"
+  },
+  "槙原志保": {
+    "attribute": "パッション",
+    "reading": "まきはらしほ"
+  },
+  "松山久美子": {
+    "attribute": "パッション",
+    "reading": "まつやまくみこ"
+  },
+  "的場梨沙": {
+    "attribute": "パッション",
+    "reading": "まとばりさ"
+  },
+  "真鍋いつき": {
+    "attribute": "パッション",
+    "reading": "まなべいつき"
+  },
+  "三好紗南": {
+    "attribute": "パッション",
+    "reading": "みよしさな"
+  },
+  "向井拓海": {
+    "attribute": "パッション",
+    "reading": "むかいたくみ"
+  },
+  "村上巴": {
+    "attribute": "パッション",
+    "reading": "むらかみともえ"
+  },
+  "メアリー・コクラン": {
+    "attribute": "パッション",
+    "reading": "めありーこくらん"
+  },
+  "諸星きらり": {
+    "attribute": "パッション",
+    "reading": "もろぼしきらり"
+  },
+  "矢口美羽": {
+    "attribute": "パッション",
+    "reading": "やぐちみう"
+  },
+  "夢見りあむ": {
+    "attribute": "パッション",
+    "reading": "ゆめみりあむ"
+  },
+  "依田芳乃": {
+    "attribute": "パッション",
+    "reading": "よりたよしの"
+  },
+  "龍崎薫": {
+    "attribute": "パッション",
+    "reading": "りゅうざきかおる"
+  },
+  "若林智香": {
+    "attribute": "パッション",
+    "reading": "わかばやしともか"
+  }
+}
