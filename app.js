@@ -13,17 +13,14 @@ const COLORS = {
   text: "#fffaf5",
 };
 
+const cameraInput = document.querySelector("#camera-input");
 const fileInput = document.querySelector("#file-input");
+const openCameraInputButton = document.querySelector("#open-camera-input-button");
 const openFileButton = document.querySelector("#open-file-button");
 const openRecognitionButton = document.querySelector("#open-recognition-button");
-const startCameraButton = document.querySelector("#start-camera-button");
-const capturePhotoButton = document.querySelector("#capture-photo-button");
-const rotateImageButton = document.querySelector("#rotate-image-button");
 const applyRecognitionButton = document.querySelector("#apply-recognition-button");
 const addPieceButton = document.querySelector("#add-piece-button");
 const showRecommendedButton = document.querySelector("#show-recommended-button");
-const cameraVideo = document.querySelector("#camera-video");
-const cameraFrame = document.querySelector("#camera-frame");
 const canvas = document.querySelector("#result-canvas");
 const ctx = canvas.getContext("2d");
 const statusLabel = document.querySelector("#status-label");
@@ -52,10 +49,7 @@ let handEntries = [];
 let activeEntryId = null;
 let expandedEntryId = null;
 let nextEntryId = 1;
-let cameraStream = null;
 let pendingNewEntryId = null;
-let deviceOrientationDegrees = null;
-let deviceOrientationListening = false;
 let pendingRecognitionEntries = [];
 
 ort.env.wasm.numThreads = 1;
@@ -144,55 +138,6 @@ function resetPickerFilters() {
 
 function setStatus(message) {
   statusLabel.textContent = message;
-}
-
-function inferOrientationFromDeviceEvent(event) {
-  if (typeof event.beta !== "number" || typeof event.gamma !== "number") {
-    return null;
-  }
-
-  if (Math.abs(event.gamma) > 45) {
-    return event.gamma > 0 ? 90 : 270;
-  }
-
-  if (Math.abs(event.beta) > 45) {
-    return 0;
-  }
-
-  return null;
-}
-
-function handleDeviceOrientation(event) {
-  const inferred = inferOrientationFromDeviceEvent(event);
-  if (inferred !== null) {
-    deviceOrientationDegrees = inferred;
-  }
-}
-
-async function ensureDeviceOrientationAccess() {
-  if (typeof window === "undefined" || typeof DeviceOrientationEvent === "undefined") {
-    return;
-  }
-
-  if (
-    typeof DeviceOrientationEvent.requestPermission === "function" &&
-    (await DeviceOrientationEvent.requestPermission()) !== "granted"
-  ) {
-    return;
-  }
-
-  if (!deviceOrientationListening) {
-    window.addEventListener("deviceorientation", handleDeviceOrientation, true);
-    deviceOrientationListening = true;
-  }
-}
-
-function stopDeviceOrientationAccess() {
-  if (!deviceOrientationListening) {
-    return;
-  }
-  window.removeEventListener("deviceorientation", handleDeviceOrientation, true);
-  deviceOrientationListening = false;
 }
 
 function clamp(value, min, max) {
@@ -536,63 +481,6 @@ async function loadImageFromSource(source) {
   });
 }
 
-async function rotateImage(image, degrees) {
-  const normalized = ((degrees % 360) + 360) % 360;
-  if (normalized === 0) {
-    return image;
-  }
-
-  const stage = document.createElement("canvas");
-  const quarterTurn = normalized === 90 || normalized === 270;
-  stage.width = quarterTurn ? image.height : image.width;
-  stage.height = quarterTurn ? image.width : image.height;
-  const stageCtx = stage.getContext("2d");
-  stageCtx.translate(stage.width / 2, stage.height / 2);
-  stageCtx.rotate((normalized * Math.PI) / 180);
-  stageCtx.drawImage(image, -image.width / 2, -image.height / 2);
-  return loadImageFromSource(stage.toDataURL("image/jpeg", 0.92));
-}
-
-async function rotateCurrentImageBy90() {
-  if (!currentImage) {
-    recognitionNote.textContent = "先に画像を用意してください。";
-    return;
-  }
-
-  currentImage = await rotateImage(currentImage, 90);
-  drawResult(currentImage, handEntries);
-  recognitionNote.textContent = "画像を 90 度回転しました。再認識します。";
-  await detectAndApplyCurrentImage();
-}
-
-function getCaptureRotationDegrees() {
-  if (typeof deviceOrientationDegrees === "number") {
-    return (360 - deviceOrientationDegrees) % 360;
-  }
-
-  const orientationAngle =
-    typeof window.screen?.orientation?.angle === "number"
-      ? window.screen.orientation.angle
-      : typeof window.orientation === "number"
-        ? window.orientation
-        : 0;
-
-  const normalized = ((orientationAngle % 360) + 360) % 360;
-  if (normalized === 90 || normalized === 270) {
-    return (360 - normalized) % 360;
-  }
-
-  const isLandscapeViewport =
-    window.matchMedia?.("(orientation: landscape)")?.matches ||
-    window.innerWidth > window.innerHeight;
-
-  if (isLandscapeViewport) {
-    return 90;
-  }
-
-  return 0;
-}
-
 function createEntry({ name = "", matches = [], score = null, box = null } = {}) {
   return {
     id: nextEntryId++,
@@ -798,7 +686,6 @@ function closeModal(kind) {
   }
   modal.hidden = true;
   if (kind === "recognition") {
-    stopCamera();
     pendingRecognitionEntries = [];
   }
   if (kind === "picker") {
@@ -822,60 +709,8 @@ function closeModal(kind) {
 
 function setCurrentImage(image, message) {
   currentImage = image;
-  cameraVideo.hidden = true;
   drawResult(currentImage, handEntries);
   recognitionNote.textContent = message;
-}
-
-async function startCamera() {
-  if (!navigator.mediaDevices?.getUserMedia) {
-    recognitionNote.textContent = "このブラウザではカメラ起動に対応していません。";
-    return;
-  }
-
-  stopCamera();
-  deviceOrientationDegrees = null;
-  await ensureDeviceOrientationAccess();
-  cameraStream = await navigator.mediaDevices.getUserMedia({
-    video: { facingMode: { ideal: "environment" } },
-    audio: false,
-  });
-  cameraVideo.srcObject = cameraStream;
-  cameraVideo.hidden = false;
-  await cameraVideo.play();
-  capturePhotoButton.disabled = false;
-  recognitionNote.textContent = "撮影してください。";
-}
-
-function stopCamera() {
-  if (cameraStream) {
-    for (const track of cameraStream.getTracks()) {
-      track.stop();
-    }
-    cameraStream = null;
-  }
-  cameraVideo.srcObject = null;
-  cameraVideo.hidden = true;
-  capturePhotoButton.disabled = true;
-  deviceOrientationDegrees = null;
-  stopDeviceOrientationAccess();
-}
-
-async function capturePhoto() {
-  if (!cameraVideo.videoWidth || !cameraVideo.videoHeight) {
-    return;
-  }
-
-  const stage = document.createElement("canvas");
-  stage.width = cameraVideo.videoWidth;
-  stage.height = cameraVideo.videoHeight;
-  stage.getContext("2d").drawImage(cameraVideo, 0, 0, stage.width, stage.height);
-  const source = stage.toDataURL("image/jpeg", 0.92);
-  const captured = await loadImageFromSource(source);
-  const image = await rotateImage(captured, getCaptureRotationDegrees());
-  stopCamera();
-  setCurrentImage(image, "撮影画像を読み込みました。");
-  await detectAndApplyCurrentImage();
 }
 
 function replaceHand(entries) {
@@ -974,6 +809,10 @@ openRecognitionButton.addEventListener("click", () => {
   openModal("recognition");
 });
 
+openCameraInputButton.addEventListener("click", () => {
+  cameraInput.click();
+});
+
 showRecommendedButton.addEventListener("click", () => {
   renderRecommendedUnits();
   openModal("recommended");
@@ -983,58 +822,33 @@ openFileButton.addEventListener("click", () => {
   fileInput.click();
 });
 
+async function handleSelectedImage(file, sourceLabel) {
+  const image = await loadImageFromSource(URL.createObjectURL(file));
+  setCurrentImage(image, `${sourceLabel}を読み込みました。`);
+  await detectAndApplyCurrentImage();
+}
+
+cameraInput.addEventListener("change", async (event) => {
+  const [file] = event.target.files;
+  if (!file) {
+    return;
+  }
+  await handleSelectedImage(file, "撮影画像");
+  event.target.value = "";
+});
+
 fileInput.addEventListener("change", async (event) => {
   const [file] = event.target.files;
   if (!file) {
     return;
   }
-  const image = await loadImageFromSource(URL.createObjectURL(file));
-  stopCamera();
-  setCurrentImage(image, "画像を読み込みました。");
-  await detectAndApplyCurrentImage();
+  await handleSelectedImage(file, "画像");
   event.target.value = "";
-});
-
-startCameraButton.addEventListener("click", () => {
-  startCamera().catch((error) => {
-    console.error(error);
-    recognitionNote.textContent = `カメラ起動に失敗しました: ${error.message}`;
-  });
-});
-
-capturePhotoButton.addEventListener("click", () => {
-  capturePhoto().catch((error) => {
-    console.error(error);
-    recognitionNote.textContent = `撮影に失敗しました: ${error.message}`;
-  });
-});
-
-rotateImageButton.addEventListener("click", () => {
-  rotateCurrentImageBy90().catch((error) => {
-    console.error(error);
-    recognitionNote.textContent = `回転に失敗しました: ${error.message}`;
-  });
 });
 
 applyRecognitionButton.addEventListener("click", () => {
   applyPendingRecognition();
 });
-
-function handleCameraTap(event) {
-  event.preventDefault();
-  if (cameraVideo.hidden || capturePhotoButton.disabled) {
-    return;
-  }
-  capturePhoto().catch((error) => {
-    console.error(error);
-    recognitionNote.textContent = `撮影に失敗しました: ${error.message}`;
-  });
-}
-
-cameraFrame.addEventListener("pointerup", handleCameraTap);
-cameraVideo.addEventListener("pointerup", handleCameraTap);
-cameraFrame.addEventListener("touchend", handleCameraTap, { passive: false });
-cameraVideo.addEventListener("touchend", handleCameraTap, { passive: false });
 
 addPieceButton.addEventListener("click", () => {
   addManualEntry();

@@ -37,21 +37,19 @@
         </div>
 
         <div class="button-row">
-          <button id="start-camera-button" type="button">カメラ起動</button>
-          <button id="capture-photo-button" type="button" class="capture-button" aria-label="撮影" disabled></button>
+          <button id="open-camera-input-button" type="button">撮影</button>
           <button id="open-file-button" type="button" class="secondary">画像選択</button>
-          <button id="rotate-image-button" type="button" class="secondary">90°回転</button>
           <button id="apply-recognition-button" type="button" class="secondary">OK</button>
         </div>
 
+        <input id="camera-input" type="file" accept="image/*" capture="environment" hidden />
         <input id="file-input" type="file" accept="image/*" hidden />
 
         <div class="recognition-grid">
-          <div id="camera-frame" class="camera-frame">
-            <video id="camera-video" playsinline autoplay muted hidden></video>
+          <div class="camera-frame">
             <canvas id="result-canvas"></canvas>
           </div>
-          <p id="recognition-note" class="note">画像を選ぶか撮影すると、即座に認識して手持ちへ反映します。</p>
+          <p id="recognition-note" class="note">撮影または画像選択のあと、自動で認識します。結果を確認して OK を押してください。</p>
         </div>
       </section>
     </div>
