@@ -1,5 +1,6 @@
 import * as ort from "./vendor/ort.min.mjs";
 
+const APP_REVISION = "v2-r1";
 const MODEL_PATH = "./assets/detector.onnx";
 const MATCHER_PATH = "./assets/matcher.onnx";
 const RERANKER_PATH = "./assets/reranker.onnx";
@@ -26,6 +27,7 @@ const addPieceButton = document.querySelector("#add-piece-button");
 const showRecommendedButton = document.querySelector("#show-recommended-button");
 const canvas = document.querySelector("#result-canvas");
 const ctx = canvas.getContext("2d");
+const ribbonTitle = document.querySelector("#ribbon-title");
 const statusLabel = document.querySelector("#status-label");
 const handCountLabel = document.querySelector("#hand-count-label");
 const recognitionNote = document.querySelector("#recognition-note");
@@ -61,6 +63,8 @@ ort.env.wasm.numThreads = 1;
 ort.env.wasm.wasmPaths = new URL("./vendor/", import.meta.url).href;
 
 async function loadApp() {
+  ribbonTitle.textContent = `CGDJ BOARD HELPER ${APP_REVISION}`;
+
   const [characterMap, loadedUnits] = await Promise.all([
     fetch(CHARACTER_DATA_PATH).then((response) => response.json()),
     fetch(UNIT_DATA_PATH).then((response) => response.json()),
