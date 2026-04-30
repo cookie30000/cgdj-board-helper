@@ -2,11 +2,14 @@ import * as ort from "./vendor/ort.min.mjs";
 
 const MODEL_PATH = "./assets/detector.onnx";
 const MATCHER_PATH = "./assets/matcher.onnx";
+const RERANKER_PATH = "./assets/reranker.onnx";
 const REFERENCE_EMBED_PATH = "./assets/reference_embeddings.json";
 const CHARACTER_DATA_PATH = "./data/characters.json";
 const UNIT_DATA_PATH = "./data/units.json";
 const MODEL_SIZE = 960;
-const MATCHER_SIZE = 160;
+const MATCHER_SIZE = 256;
+const RERANK_TOPK_NAMES = 10;
+const RERANK_FUSION_ALPHA = 0.2;
 const COLORS = {
   box: "#b34d2e",
   textBg: "#8d381e",
@@ -39,7 +42,9 @@ const recommendedModal = document.querySelector("#recommended-modal");
 
 let detectorSession;
 let matcherSession;
+let rerankerSession;
 let referenceEmbeddings = [];
+let referenceByName = new Map();
 let currentImage = null;
 let charactersByName = {};
 let characterRecords = [];
@@ -88,7 +93,12 @@ async function loadApp() {
     executionProviders: ["wasm"],
     graphOptimizationLevel: "all",
   });
+  rerankerSession = await ort.InferenceSession.create(RERANKER_PATH, {
+    executionProviders: ["wasm"],
+    graphOptimizationLevel: "all",
+  });
   referenceEmbeddings = await loadReferenceEmbeddings();
+  referenceByName = groupReferencesByName(referenceEmbeddings);
 
   setStatus("準備完了");
 }
@@ -294,6 +304,13 @@ function filterDetectionOutliers(boxes) {
   return keptRows.flat();
 }
 
+function limitTopDetections(boxes, limit) {
+  if (limit <= 0 || boxes.length <= limit) {
+    return boxes;
+  }
+  return [...boxes].sort((a, b) => b.score - a.score).slice(0, limit);
+}
+
 function toRows(output) {
   const { dims, data } = output;
 
@@ -349,7 +366,7 @@ function decode(output, original, ratio, dw, dh, confThreshold, iouThreshold) {
     });
   }
 
-  return filterDetectionOutliers(nms(boxes, iouThreshold));
+  return limitTopDetections(filterDetectionOutliers(nms(boxes, iouThreshold)), 9);
 }
 
 function sortBoxesForHand(boxes) {
@@ -428,8 +445,24 @@ async function loadReferenceEmbeddings() {
     for (let index = 0; index < embedding.length; index += 1) {
       embedding[index] /= norm;
     }
-    return { name: row.name, embedding };
+    return {
+      id: row.id,
+      name: row.name,
+      embedding,
+      colorFeature: new Float32Array(row.colorFeature || []),
+    };
   });
+}
+
+function groupReferencesByName(rows) {
+  const grouped = new Map();
+  for (const row of rows) {
+    if (!grouped.has(row.name)) {
+      grouped.set(row.name, []);
+    }
+    grouped.get(row.name).push(row);
+  }
+  return grouped;
 }
 
 function cosineScores(embedding) {
@@ -441,17 +474,175 @@ function cosineScores(embedding) {
     }
     const current = bestByName.get(ref.name);
     if (!current || score > current.score) {
-      bestByName.set(ref.name, { name: ref.name, score });
+      bestByName.set(ref.name, { name: ref.name, score, refId: ref.id });
+    }
+  }
+  return [...bestByName.values()].sort((a, b) => b.score - a.score);
+}
+
+function sigmoid(value) {
+  return 1 / (1 + Math.exp(-value));
+}
+
+function rgbToHsv(r, g, b) {
+  const rn = r / 255;
+  const gn = g / 255;
+  const bn = b / 255;
+  const max = Math.max(rn, gn, bn);
+  const min = Math.min(rn, gn, bn);
+  const delta = max - min;
+
+  let h = 0;
+  if (delta !== 0) {
+    if (max === rn) {
+      h = ((gn - bn) / delta) % 6;
+    } else if (max === gn) {
+      h = (bn - rn) / delta + 2;
+    } else {
+      h = (rn - gn) / delta + 4;
+    }
+    h *= 60;
+    if (h < 0) h += 360;
+  }
+  const s = max === 0 ? 0 : delta / max;
+  const v = max;
+  return [h / 2, s * 255, v * 255];
+}
+
+function computeColorFeature(canvasOrImage) {
+  const stage = document.createElement("canvas");
+  stage.width = canvasOrImage.width;
+  stage.height = canvasOrImage.height;
+  const stageCtx = stage.getContext("2d");
+  stageCtx.drawImage(canvasOrImage, 0, 0);
+  const { data, width, height } = stageCtx.getImageData(0, 0, stage.width, stage.height);
+  const hist = new Float32Array(18 * 12);
+  let sumH = 0;
+  let sumS = 0;
+  let sumV = 0;
+  let sumH2 = 0;
+  let sumS2 = 0;
+  let sumV2 = 0;
+  const count = width * height || 1;
+
+  for (let i = 0; i < count; i += 1) {
+    const src = i * 4;
+    const [h, s, v] = rgbToHsv(data[src], data[src + 1], data[src + 2]);
+    const hBin = Math.min(17, Math.floor(h / 10));
+    const sBin = Math.min(11, Math.floor(s / (256 / 12)));
+    hist[hBin * 12 + sBin] += 1;
+    sumH += h;
+    sumS += s;
+    sumV += v;
+    sumH2 += h * h;
+    sumS2 += s * s;
+    sumV2 += v * v;
+  }
+
+  let l2 = 0;
+  for (let i = 0; i < hist.length; i += 1) {
+    l2 += hist[i] * hist[i];
+  }
+  l2 = Math.sqrt(l2) || 1;
+  for (let i = 0; i < hist.length; i += 1) {
+    hist[i] /= l2;
+  }
+
+  const meanH = sumH / count / 180;
+  const meanS = sumS / count / 255;
+  const meanV = sumV / count / 255;
+  const stdH = Math.sqrt(Math.max(0, sumH2 / count - (sumH / count) ** 2)) / 180;
+  const stdS = Math.sqrt(Math.max(0, sumS2 / count - (sumS / count) ** 2)) / 255;
+  const stdV = Math.sqrt(Math.max(0, sumV2 / count - (sumV / count) ** 2)) / 255;
+
+  const feature = new Float32Array(hist.length + 6);
+  feature.set(hist, 0);
+  feature.set([meanH, meanS, meanV, stdH, stdS, stdV], hist.length);
+  return feature;
+}
+
+function buildRerankFeature(queryEmbedding, refEmbedding, queryColor, refColor, baseScore) {
+  const dim = queryEmbedding.length;
+  const feature = new Float32Array(dim * 4 + 1 + 1 + 1 + 6 + 6);
+  let offset = 0;
+  feature.set(queryEmbedding, offset);
+  offset += dim;
+  feature.set(refEmbedding, offset);
+  offset += dim;
+  for (let i = 0; i < dim; i += 1) feature[offset + i] = Math.abs(queryEmbedding[i] - refEmbedding[i]);
+  offset += dim;
+  for (let i = 0; i < dim; i += 1) feature[offset + i] = queryEmbedding[i] * refEmbedding[i];
+  offset += dim;
+  feature[offset] = baseScore;
+  offset += 1;
+
+  let histIntersection = 0;
+  let histBC = 0;
+  for (let i = 0; i < 216; i += 1) {
+    histIntersection += Math.min(queryColor[i], refColor[i]);
+    histBC += Math.sqrt(Math.max(0, queryColor[i] * refColor[i]));
+  }
+  feature[offset] = histIntersection;
+  offset += 1;
+  const bhattDistance = Math.sqrt(Math.max(0, 1 - histBC));
+  feature[offset] = 1 - bhattDistance;
+  offset += 1;
+
+  for (let i = 216; i < 222; i += 1) feature[offset + (i - 216)] = Math.abs(queryColor[i] - refColor[i]);
+  offset += 6;
+  for (let i = 216; i < 222; i += 1) feature[offset + (i - 216)] = queryColor[i] * refColor[i];
+  return feature;
+}
+
+async function rerankScores(queryEmbedding, queryColor, rankedNames) {
+  const inputName = rerankerSession.inputNames[0];
+  const outputName = rerankerSession.outputNames[0];
+  const pairFeatures = [];
+  const pairMeta = [];
+
+  for (const candidate of rankedNames.slice(0, RERANK_TOPK_NAMES)) {
+    const refs = referenceByName.get(candidate.name) || [];
+    for (const ref of refs) {
+      pairFeatures.push(buildRerankFeature(queryEmbedding, ref.embedding, queryColor, ref.colorFeature, candidate.score));
+      pairMeta.push({ name: candidate.name, browserScore: candidate.score });
+    }
+  }
+  if (pairFeatures.length === 0) {
+    return rankedNames.slice(0, 3);
+  }
+
+  const featureDim = pairFeatures[0].length;
+  const flat = new Float32Array(pairFeatures.length * featureDim);
+  pairFeatures.forEach((row, index) => flat.set(row, index * featureDim));
+  const tensor = new ort.Tensor("float32", flat, [pairFeatures.length, featureDim]);
+  const outputs = await rerankerSession.run({ [inputName]: tensor });
+  const logits = outputs[outputName].data;
+
+  const bestByName = new Map();
+  for (let i = 0; i < pairMeta.length; i += 1) {
+    const meta = pairMeta[i];
+    const rerankProb = sigmoid(logits[i]);
+    const fused = (1 - RERANK_FUSION_ALPHA) * rerankProb + RERANK_FUSION_ALPHA * ((meta.browserScore + 1) / 2);
+    const current = bestByName.get(meta.name);
+    if (!current || fused > current.score) {
+      bestByName.set(meta.name, { name: meta.name, score: fused });
     }
   }
   return [...bestByName.values()].sort((a, b) => b.score - a.score);
 }
 
 function cropBoxToCanvas(image, box) {
-  const left = Math.max(0, Math.floor(box.x1));
-  const top = Math.max(0, Math.floor(box.y1));
-  const width = Math.max(1, Math.ceil(box.x2 - box.x1));
-  const height = Math.max(1, Math.ceil(box.y2 - box.y1));
+  const bw = box.x2 - box.x1;
+  const bh = box.y2 - box.y1;
+  const mx = Math.floor(bw * 0.10);
+  const myTop = Math.floor(bh * 0.10);
+  const myBottom = Math.floor(bh * 0.06);
+  const left = Math.max(0, Math.floor(box.x1) - mx);
+  const top = Math.max(0, Math.floor(box.y1) - myTop);
+  const right = Math.min(image.width, Math.ceil(box.x2) + mx);
+  const bottom = Math.min(image.height, Math.ceil(box.y2) + myBottom);
+  const width = Math.max(1, right - left);
+  const height = Math.max(1, bottom - top);
   const crop = document.createElement("canvas");
   crop.width = width;
   crop.height = height;
@@ -467,7 +658,11 @@ async function matchBoxes(image, boxes) {
     const crop = cropBoxToCanvas(image, box);
     const tensor = toMatcherTensor(crop);
     const outputs = await matcherSession.run({ [inputName]: tensor });
-    results.push(cosineScores(outputs[outputName].data).slice(0, 4));
+    const embedding = new Float32Array(outputs[outputName].data);
+    const queryColor = computeColorFeature(crop);
+    const ranked = cosineScores(embedding);
+    const reranked = await rerankScores(embedding, queryColor, ranked);
+    results.push(reranked.slice(0, 4).map((row) => ({ name: row.name, score: row.score })));
   }
   return results;
 }
