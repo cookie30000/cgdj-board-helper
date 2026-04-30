@@ -2,9 +2,9 @@ import * as ort from "./vendor/ort.min.mjs";
 
 const APP_REVISION = "v2-r1";
 const MODEL_PATH = "./assets/detector.onnx";
-const MATCHER_PATH = "./assets/matcher.onnx";
-const RERANKER_PATH = "./assets/reranker.onnx";
-const REFERENCE_EMBED_PATH = "./assets/reference_embeddings.json";
+const MATCHER_PATH = "./assets/matcher.onnx?v=20260430";
+const RERANKER_PATH = "./assets/reranker.onnx?v=20260430";
+const REFERENCE_EMBED_PATH = "./assets/reference_embeddings.json?v=20260430";
 const CHARACTER_DATA_PATH = "./data/characters.json";
 const UNIT_DATA_PATH = "./data/units.json";
 const MODEL_SIZE = 960;
